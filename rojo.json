@@ -1,0 +1,10 @@
+{
+  "name": "ElectricArcs",
+  "servePort": 8000,
+  "partitions": {
+    "Arcs": {
+      "path": "lib",
+      "target": "ReplicatedStorage.Arcs"
+    }
+  }
+}
