@@ -2,7 +2,7 @@
 
 This is an implementation of an electric arc effect for Roblox games.
 
-Courtesy of user @AllYourBlox for the original implementation of the algorithm that produces the line segments for the arcs ([click here]()). The original code has been modularized and optimized for ease of use and more widely applicable use.
+Courtesy of user @AllYourBlox for the original implementation of the algorithm that produces the line segments for the arcs ([click here](https://devforum.roblox.com/t/electric-arc-demo-with-rbxls/35433)). The original code has been modularized and optimized for ease of use and more widely applicable use.
 
 The original code manipulated many neon parts every frame which was not optimal due to the work it takes for the engine to update the position and size of baseparts. This version draws the line segments that represent the arcs through ImageHandleAdornments with the texture of a glowing line segment.
 
