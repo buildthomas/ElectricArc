@@ -4,17 +4,19 @@ This is an implementation of an electric arc effect for Roblox games.
 
 Courtesy of user @AllYourBlox for the original implementation of the algorithm that produces the line segments for the arcs ([click here](https://devforum.roblox.com/t/electric-arc-demo-with-rbxls/35433)). The original code has been modularized and optimized for ease of use and more widely applicable use.
 
-The original code manipulated many neon parts every frame which was not optimal due to the work it takes for the engine to update the position and size of baseparts. This version draws the line segments that represent the arcs through ImageHandleAdornments with the texture of a glowing line segment.
+The original code manipulated many neon parts every frame which was not optimal due to the work it takes for the engine to update the position and size of baseparts. This version draws the line segments that represent the arcs through ImageHandleAdornments with the texture of a glowing line segment. Please note that this is still somewhat on the performance-heavy side and may be an overkill kind of implementation for such an electricity effect, but the library does include auto-throttling and other tricks to make sure the frame rate stays as high as possible and no effort is wasted updating effects that are far away compared to those closeby.
 
 # Showcase
 
-TODO: ADD GIF
+See here for a visual example:
 
-## Download
+https://gfycat.com/ConcernedPersonalHammerkop
+
+## Downloads
 
 A model file and example place can be downloaded through the following Developer Forum thread (if you would prefer not to work from source):
 
-TODO: ADD THREAD
+https://devforum.roblox.com/t/release-electric-arcs-effect/228413
 
 # Usage
 
@@ -170,6 +172,6 @@ Will stop and clean up the effect.
 
 # License
 
-This library is available under the MIT license.
+This library is freely available for use in your projects under the MIT license.
 
 Credit to @AllYourBlox for open-sourcing the algorithm that produces the line segments for the arcs, which was edited and optimized for this implementation.
