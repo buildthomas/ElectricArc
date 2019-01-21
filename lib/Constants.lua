@@ -1,3 +1,9 @@
+--[[	Constants.lua
+		Contains all constants used by the Arc library.
+		This module is licensed under MIT, refer to the LICENSE file or:
+		https://github.com/buildthomas/ElectricArc/blob/master/LICENSE
+]]
+
 return {
 
 	DEFAULT_COLOR = Color3.new(0.4, 0.8, 1);        -- The darkest color of arcs

@@ -1,3 +1,10 @@
+--[[	System.lua
+		Handles internal updating of the graphical effects of the arcs,
+		as well as performing throttling for performance.
+		This module is licensed under MIT, refer to the LICENSE file or:
+		https://github.com/buildthomas/ElectricArc/blob/master/LICENSE
+]]
+
 local System = {}
 
 local Players = game:GetService("Players")

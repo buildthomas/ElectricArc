@@ -1,3 +1,9 @@
+--[[	Util.lua
+		Some utility functions used by the other files in the Arc library.
+		This module is licensed under MIT, refer to the LICENSE file or:
+		https://github.com/buildthomas/ElectricArc/blob/master/LICENSE
+]]
+
 local Util = {}
 
 local GLOBAL_ID = 0

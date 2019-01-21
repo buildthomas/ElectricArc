@@ -1,3 +1,9 @@
+--[[	Arc.lua
+		Implementation of the main Arc class of this library that the user interacts.
+		This module is licensed under MIT, refer to the LICENSE file or:
+		https://github.com/buildthomas/ElectricArc/blob/master/LICENSE
+]]
+
 local Arc = {}
 Arc.__index = Arc
 
