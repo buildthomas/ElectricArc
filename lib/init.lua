@@ -5,14 +5,13 @@ local Util = require(script.Util)
 local Constants = require(script.Constants)
 local System = require(script.System)
 
-local ERROR_TYPE_FORMAT = "bad argument #%d to '%s' (%s expected, got %s)" -- Error format for type errors
-local ERROR_BAD_ARGUMENT = "bad argument #%d to '%s' (%s)" -- Generic bad argument error format
+-- Error format strings
+local ERROR_TYPE_FORMAT = "bad argument #%d to '%s' (%s expected, got %s)"
+local ERROR_BAD_ARGUMENT = "bad argument #%d to '%s' (%s)"
 
--- Shorthands
-local cframe = CFrame.new
-local color3 = Color3.new
-local colorBlack = color3(0, 0, 0)
-local cross = Vector3.new().Cross
+function Arc:GetEnabled()
+	return System.contains(self)
+end
 
 function Arc:SetEnabled(value)
 	if value then
@@ -22,22 +21,12 @@ function Arc:SetEnabled(value)
 	end
 end
 
+function Arc:GetCFrame()
+	return self.cframe
+end
+
 function Arc:SetCFrame(cfr)
     self.cframe = cfr
-    self.changed = true
-end
-
-function Arc:GetCFrame()
-    return self.cframe
-end
-
-function Arc:Translate(vector)
-    self.cframe = self.cframe + vector
-    self.changed = true
-end
-
-function Arc:Transform(transformation)
-    self.cframe = self.cframe * transformation
     self.changed = true
 end
 
@@ -46,9 +35,12 @@ function Arc:GetRange()
 end
 
 function Arc:SetRange(source, drain)
-    local axis = drain - source
+	local axis = drain - source
+	if axis.magnitude < 0.001 then
+		axis = Vector3.new(0, 0, -0.001)
+	end
     self.length = axis.magnitude
-    self.cframe = Util.makeOrientation(source, axis)
+	self.cframe = Util.makeOrientation(source, axis)
     self.changed = true
 end
 
@@ -60,6 +52,18 @@ function Arc:SetColor(color)
     self.color = color
 end
 
+function Arc:GetTopColor()
+    return self.topColor
+end
+
+function Arc:SetTopColor(topColor)
+    self.topColor = topColor
+end
+
+function Arc:GetNumArcs()
+	return self.numArcs
+end
+
 function Arc:Destroy()
     -- Remove self from system
     System.remove(self)
@@ -67,18 +71,6 @@ function Arc:Destroy()
     -- Destroying instances
     self.partFolder:Destroy()
     self.segmentsFolder:Destroy()
-end
-
-function Arc:RealignToCamera()
-    local relativeCamPos = self.cframe:inverse() * workspace.CurrentCamera.CFrame.p
-    for _, v in pairs(self.segments) do
-        local c = v.CFrame
-        local po = c.p
-        local up = c.upVector
-        local lf = cross(relativeCamPos - po, up).unit
-        local fr = cross(lf, up).unit
-        v.CFrame = cframe(po.x, po.y, po.z, lf.x, up.x, fr.x, lf.y, up.y, fr.y, lf.z, up.z, fr.z)
-    end
 end
 
 function Arc.new(source, drain, color, topColor, numArcs, enabled)
@@ -92,14 +84,14 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
         error(ERROR_TYPE_FORMAT:format(4, "new", "Color3", typeof(topColor)), 2)
     elseif numArcs ~= nil and type(numArcs) ~= "number" then
         error(ERROR_TYPE_FORMAT:format(5, "new", "number", typeof(numArcs)), 2)
-    elseif numArcs < 1 then
+    elseif numArcs ~= nil and numArcs < 1 then
         error(ERROR_BAD_ARGUMENT:format(5, "new", "the number of arcs should be >= 1"), 2)
 	elseif enabled ~= nil and type(enabled) ~= "boolean" then
         error(ERROR_TYPE_FORMAT:format(6, "new", "boolean", typeof(enabled)), 2)
 	end
 
-	source = source or Constants.DEFAULT_SOURCE_POS
-	drain = drain or Constants.DEFAULT_DRAIN_POS
+	source = source or Vector3.new()
+	drain = drain or Vector3.new()
 	color = color or Constants.DEFAULT_COLOR
 	topColor = topColor or Constants.DEFAULT_TOP_COLOR
 	numArcs = numArcs or Constants.DEFAULT_NUM_ARCS
@@ -146,12 +138,12 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
 	emitterPart.TopSurface = Enum.SurfaceType.Smooth
 	emitterPart.BottomSurface = Enum.SurfaceType.Smooth
 	emitterPart.Size = Vector3.new(0.2, 0.2, self.length)
-	emitterPart.CFrame = cframe((drain + source) / 2, source)
+	emitterPart.CFrame = CFrame.new((drain + source) / 2, source)
 	emitterPart.Parent = self.partFolder
 
 	local emitterEffect = Instance.new("ParticleEmitter")
 	emitterEffect.Name = "ParticleEmitter"
-	emitterEffect.Color = ColorSequence.new(colorBlack:lerp(color, Constants.PARTICLE_COLOR_MODIFIER))
+	emitterEffect.Color = ColorSequence.new(Color3.new(0, 0, 0):lerp(color, Constants.PARTICLE_COLOR_MODIFIER))
 	emitterEffect.LightEmission = Constants.PARTICLE_LIGHT_EMISSION
 	emitterEffect.LightInfluence = Constants.PARTICLE_LIGHT_INFLUENCE
 	emitterEffect.Size = NumberSequence.new(self.length * Constants.PARTICLE_SIZE_MODIFIER)
@@ -161,10 +153,11 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
 
 	local emitterLight = Instance.new("PointLight")
 	emitterLight.Name = "PointLight"
-	emitterLight.Brightness = 10
-	emitterLight.Color = colorBlack:lerp(color, Constants.LIGHT_COLOR_MODIFIER)
-	emitterLight.Range = 60
-	emitterLight.Shadows = false
+	emitterLight.Brightness = 5
+	emitterLight.Color = Color3.new(0, 0, 0):lerp(color, Constants.LIGHT_COLOR_MODIFIER)
+	emitterLight.Range = 0
+	emitterLight.Shadows = true
+	emitterLight.Enabled = Constants.USE_POINTLIGHT
 	emitterLight.Parent = emitterPart
 
     -- Preparing a pool of particles to be used for the effect
@@ -208,6 +201,38 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
     return self
 end
 
-Arc.New = Arc.new -- Alias
+function Arc.link(source, drain, color, topColor, numArcs, enabled)
+	if typeof(source) ~= "Instance" or not source:IsA("Attachment") then
+        error(ERROR_TYPE_FORMAT:format(1, "attach", "Attachment", typeof(source)), 2)
+    elseif typeof(drain) ~= "Instance" or not drain:IsA("Attachment") then
+        error(ERROR_TYPE_FORMAT:format(2, "attach", "Attachment", typeof(drain)), 2)
+    elseif color ~= nil and typeof(color) ~= "Color3" then
+        error(ERROR_TYPE_FORMAT:format(3, "attach", "Color3", typeof(color)), 2)
+    elseif topColor ~= nil and typeof(topColor) ~= "Color3" then
+        error(ERROR_TYPE_FORMAT:format(4, "attach", "Color3", typeof(topColor)), 2)
+    elseif numArcs ~= nil and type(numArcs) ~= "number" then
+        error(ERROR_TYPE_FORMAT:format(5, "attach", "number", typeof(numArcs)), 2)
+    elseif numArcs ~= nil and numArcs < 1 then
+        error(ERROR_BAD_ARGUMENT:format(5, "attach", "the number of arcs should be >= 1"), 2)
+	elseif enabled ~= nil and type(enabled) ~= "boolean" then
+        error(ERROR_TYPE_FORMAT:format(6, "attach", "boolean", typeof(enabled)), 2)
+	end
+
+	local self = Arc.new(source.WorldPosition, drain.WorldPosition, color, topColor, numArcs, false)
+	self.dynamic = true
+	self.source = source
+	self.drain = drain
+
+	if enabled or (enabled == nil and Constants.DEFAULT_ENABLED) then
+		-- Add to system if enabled at creation now that self.dynamic is set
+		System.add(self)
+	end
+
+	return self
+end
+
+-- Aliases
+Arc.New = Arc.new
+Arc.Link = Arc.link
 
 return Arc

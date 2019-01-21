@@ -18,6 +18,21 @@ local sqrt = math.sqrt
 local dot = zeroVector.Dot
 local cross = zeroVector.Cross
 
+--[[
+-- Unused because too expensive to be worth the benefit since you'd have to call it often
+local function RealignArcToCamera(self)
+    local relativeCamPos = self.cframe:inverse() * workspace.CurrentCamera.CFrame.p
+    for _, v in pairs(self.segments) do
+        local c = v.CFrame
+        local po = c.p
+        local up = c.upVector
+        local lf = cross(relativeCamPos - po, up).unit
+        local fr = cross(lf, up).unit
+        v.CFrame = cframe(po.x, po.y, po.z, lf.x, up.x, fr.x, lf.y, up.y, fr.y, lf.z, up.z, fr.z)
+    end
+end
+]]
+
 -- Making a CFrame value from an origin position and unit direction:
 function Util.makeOrientation(sourcePos, dir)
     -- Construct CFrame to rotate parts from x-axis alignment (where they are constructed) to
