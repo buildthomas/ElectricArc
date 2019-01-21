@@ -12,19 +12,13 @@ return {
 	ARC_MIN_FATNESS = 0.4;
 	ARC_MAX_FATNESS = 5;
 
-	PARTICLE_LIGHT_EMISSION = 1;                    -- Background particle beam properties
-	PARTICLE_LIGHT_INFLUENCE = 0;
-	PARTICLE_SIZE_MODIFIER = 0.15;
-	PARTICLE_COLOR_MODIFIER = 0.15;
-	PARTICLE_TEXTURE = "rbxassetid://712446122";
-	PARTICLE_TRANSPARENCY = 0.98;
-
 	LIGHT_COLOR_MODIFIER = 0.8;                     -- Background light properties
 
 	ARCS_MAIN_FOLDER = "ArcParticles";              -- Name of particle and basepart storage in PlayerGui/workspace
 
-	PARTFOLDER_NAME_TEMPLATE = "arc_%05d";          -- Name format of storage of parts
-	SEGMENT_NAME_TEMPLATE = "segment_%05d";         -- Name format of individual particles
+	PART_NAME_TEMPLATE = "arc_%05d";                -- Name format of source part
+	SEGMENT_FOLDER_NAME_TEMPLATE = "segments_%05d"; -- Name format of top-level segments folder
+	SEGMENT_NAME_TEMPLATE = "segment_%05d";         -- Name format of individual segment effects
 
 	AUTO_THROTTLE_FRAME_INTERVAL = 0.500;           -- Interval in seconds over which FPS is calculated for auto-throttling
 	AUTO_THROTTLE_INCREMENT = 0.05;                 -- Increment of arc update rate per up/down-throttle

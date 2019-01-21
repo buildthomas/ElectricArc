@@ -69,7 +69,7 @@ function Arc:Destroy()
     System.remove(self)
 
     -- Destroying instances
-    self.partFolder:Destroy()
+    self.part:Destroy()
     self.segmentsFolder:Destroy()
 end
 
@@ -111,12 +111,9 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
     self.arcRenderAmount = 0 -- Number of arcs left to render in next heartbeat (can be a real value)
     self.visible = true -- Whether effect is on-screen
 
-	-- Folder object in Camera to store part instances in
-	self.partFolder = Instance.new("Model")
-	self.partFolder.Name = Constants.PARTFOLDER_NAME_TEMPLATE:format(self.id)
-
+	-- Part that all effects are attached to, with a light in it
 	local sourcePart = Instance.new("Part")
-	sourcePart.Name = "Source"
+	sourcePart.Name = Constants.PART_NAME_TEMPLATE:format(self.id)
 	sourcePart.Anchored = true
 	sourcePart.CanCollide = false
 	sourcePart.Locked = true
@@ -126,30 +123,12 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
 	sourcePart.BottomSurface = Enum.SurfaceType.Smooth
 	sourcePart.Size = Vector3.new(0.05, 0.05, 0.05)
     sourcePart.CFrame = self.cframe
-	sourcePart.Parent = self.partFolder
+	self.part = sourcePart
 
-	local emitterPart = Instance.new("Part")
-	emitterPart.Name = "Emitter"
-	emitterPart.Anchored = true
-	emitterPart.CanCollide = false
-	emitterPart.Locked = true
-	emitterPart.Archivable = false
-	emitterPart.Transparency = 1
-	emitterPart.TopSurface = Enum.SurfaceType.Smooth
-	emitterPart.BottomSurface = Enum.SurfaceType.Smooth
-	emitterPart.Size = Vector3.new(0.2, 0.2, self.length)
-	emitterPart.CFrame = CFrame.new((drain + source) / 2, source)
-	emitterPart.Parent = self.partFolder
-
-	local emitterEffect = Instance.new("ParticleEmitter")
-	emitterEffect.Name = "ParticleEmitter"
-	emitterEffect.Color = ColorSequence.new(Color3.new(0, 0, 0):lerp(color, Constants.PARTICLE_COLOR_MODIFIER))
-	emitterEffect.LightEmission = Constants.PARTICLE_LIGHT_EMISSION
-	emitterEffect.LightInfluence = Constants.PARTICLE_LIGHT_INFLUENCE
-	emitterEffect.Size = NumberSequence.new(self.length * Constants.PARTICLE_SIZE_MODIFIER)
-	emitterEffect.Texture = Constants.PARTICLE_TEXTURE
-	emitterEffect.Transparency = NumberSequence.new(Constants.PARTICLE_TRANSPARENCY)
-	emitterEffect.Parent = emitterPart
+	local emitter = Instance.new("Attachment")
+	emitter.Name = "Emitter"
+	emitter.CFrame = CFrame.new(self.length/2, 0, 0)
+	emitter.Parent = sourcePart
 
 	local emitterLight = Instance.new("PointLight")
 	emitterLight.Name = "PointLight"
@@ -158,17 +137,17 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
 	emitterLight.Range = 0
 	emitterLight.Shadows = true
 	emitterLight.Enabled = Constants.USE_POINTLIGHT
-	emitterLight.Parent = emitterPart
+	emitterLight.Parent = emitter
 
     -- Preparing a pool of particles to be used for the effect
     self.segments = {}
     self.segmentsFolder = Instance.new("Folder")
-    self.segmentsFolder.Name = Constants.PARTFOLDER_NAME_TEMPLATE:format(self.id)
+    self.segmentsFolder.Name = Constants.SEGMENT_FOLDER_NAME_TEMPLATE:format(self.id)
     for i = 1, (numArcs * Constants.SEGMENT_PER_ARC_MAX) do
         local segment = Instance.new("ImageHandleAdornment", self.segmentsFolder)
         segment.Name = Constants.SEGMENT_NAME_TEMPLATE:format(i)
         segment.Image = Constants.ARC_TEXTURE
-        segment.Adornee = self.partFolder.Source
+        segment.Adornee = self.part
         segment.Size = Vector2.new(0, 0)
         segment.ZIndex = 0
         self.segments[i] = segment

@@ -220,7 +220,7 @@ local function updateArc(self)
 	end
 
 	-- Update brightness of light in emitter part
-	self.partFolder.Emitter.PointLight.Brightness = totalBrightness / self.numArcs
+	self.part.Emitter.PointLight.Brightness = totalBrightness / self.numArcs
 
 	-- Subtract integer part from the amount of arcs to be updated
 	self.arcRenderAmount = self.arcRenderAmount % 1
@@ -245,10 +245,9 @@ local function onHeartbeat()
 		end
 		v.length = axis.magnitude
 		v.cframe = Util.makeOrientation(source, axis)
-		v.partFolder.Source.CFrame = v.cframe
-		v.partFolder.Emitter.Size = vec3(0.05, 0.05, v.length)
-		v.partFolder.Emitter.CFrame = cframe(v.cframe * vec3(v.length / 2, 0, 0), v.cframe.p)
-		v.partFolder.Emitter.PointLight.Range = v.length
+		v.part.CFrame = v.cframe
+		v.part.Emitter.CFrame = CFrame.new(v.length/2, 0, 0)
+		v.part.Emitter.PointLight.Range = v.length
 	end
 
 	-- Check if objects are on/off-screen
@@ -279,10 +278,9 @@ local function onHeartbeat()
 		if v.visible then
 			-- Update CFrame/Size of instances if object values were changed
 			if v.changed then
-				v.partFolder.Source.CFrame = v.cframe
-				v.partFolder.Emitter.Size = vec3(0.05, 0.05, v.length)
-				v.partFolder.Emitter.CFrame = cframe(v.cframe * vec3(v.length / 2, 0, 0), v.cframe.p)
-				v.partFolder.Emitter.PointLight.Range = v.length
+				v.part.CFrame = v.cframe
+				v.part.Emitter.CFrame = CFrame.new(v.length/2, 0, 0)
+				v.part.Emitter.PointLight.Range = v.length
 				v.changed = false
 			end
 
@@ -339,7 +337,7 @@ function System.add(arc)
 		arcInstances[arc] = true
 		numInstances = numInstances + 1
 		arc.segmentsFolder.Parent = MainFolder
-		arc.partFolder.Parent = MainPartFolder
+		arc.part.Parent = MainPartFolder
 		if arc.dynamic then
 			dynamicInstances[arc] = true
 		end
@@ -358,7 +356,7 @@ function System.remove(arc)
 		dynamicInstances[arc] = nil
 		numInstances = numInstances - 1
 		arc.segmentsFolder.Parent = nil
-		arc.partFolder.Parent = nil
+		arc.part.Parent = nil
 		updateConnection()
 	end
 end
