@@ -179,7 +179,8 @@ local function updateArc(self)
 
 		-- Fatness of arc based on its brightness and length, capped on min/max
 		local fatness = math.clamp(
-			self.length * Constants.ARC_FATNESS_SIZE_MODIFIER * (brightness[arc] > 0.98 and 2 or 1),
+			self.fatnessMultiplier * self.length * Constants.ARC_FATNESS_SIZE_MODIFIER
+				* (brightness[arc] > Constants.ARC_STRONG_BRIGHTNESS_THRESHOLD and Constants.ARC_FATNESS_STRONG_MULTIPLIER or 1),
 			Constants.ARC_MIN_FATNESS,
 			Constants.ARC_MAX_FATNESS
 		)
@@ -206,7 +207,7 @@ local function updateArc(self)
 			local fr = cross(lf, up).unit
 
 			-- Update handle
-			imgAdornment.Size = vec2(fatness, diff.magnitude + fatness/16)
+			imgAdornment.Size = vec2(fatness, diff.magnitude + fatness * Constants.ARC_FATNESS_OVERLAP_RATIO)
 			imgAdornment.Color3 = color
 			imgAdornment.CFrame = cframe(
 				po.x, po.y, po.z,

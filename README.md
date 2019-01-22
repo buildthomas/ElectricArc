@@ -45,18 +45,28 @@ local arc3 = Arc.new(
     Color3.new(0, 1, 0)
 )
 
+-- Make a blue one with 12 arcs (instead of default 6) with segments that are half as wide as normal:
+local arc4 = Arc.new(
+    Vector3.new(10, 10, 0),
+    Vector3.new(-10, 10, 0),
+    Color3.new(.5, .5, 1)       -- cyan
+    Color3.new(1, 1, 1),        -- top color (not important here)
+    12,                         -- number of arcs
+    0.5                         -- fatness multiplier (half of normal)
+)
+
 -- Change various properties while it is running:
 arc1:SetColor(Color3.new(1, 0, 0)) -- make it red
 arc1:SetRange(Vector3.new(20, 10, 0), Vector3.new(-20, 10, 0)) -- update points
 arc2:SetEnabled(false) -- toggle off temporarily
 arc3:SetCFrame(arc3:GetCFrame() + Vector3.new(0, 5, 0)) -- move up by 5 studs
-
+arc4:SetFatnessMultiplier(2) -- twice as fat as default now
 
 -- Cleanup arcs:
 arc1:Destroy()
 arc2:Destroy()
 arc3:Destroy()
-
+arc4:Destroy()
 ```
 
 # API Listing
@@ -74,6 +84,7 @@ These methods will return an Arc object that can be manipulated further with the
     Color3 basisColor = DEFAULT_COLOR,    -- darkest color
     Color3 topColor = DEFAULT_TOP_COLOR,  -- brightest color
     number numArcs = DEFAULT_NUM_ARCS,    -- amount of separate arcs at once
+    number fatnessMultiplier = 1,         -- make the segments of this arc thinner/thicker
     bool enabled = DEFAULT_ENABLED        -- start out enabled?
 )
 
@@ -87,6 +98,7 @@ Arc.New => Alias for Arc.new
     Color3 basisColor = DEFAULT_COLOR,
     Color3 topColor = DEFAULT_TOP_COLOR,
     number numArcs = DEFAULT_NUM_ARCS,
+    number fatnessMultiplier = 1,
     bool enabled = DEFAULT_ENABLED
 )
 
@@ -160,6 +172,16 @@ ArcObject:SetTopColor(
 
 ```text
 <number> ArcObject:GetNumberOfArcs()
+```
+
+```text
+<number> ArcObject:GetFatnessMultiplier()
+```
+
+```text
+ArcObject:SetFatnessMultiplier(
+    number topColor
+)
 ```
 
 ## Destructor

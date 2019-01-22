@@ -79,7 +79,15 @@ function Arc:Destroy()
     self.segmentsFolder:Destroy()
 end
 
-function Arc.new(source, drain, color, topColor, numArcs, enabled)
+function Arc:GetFatnessMultiplier()
+	return self.fatnessMultiplier
+end
+
+function Arc:SetFatnessMultiplier(fatnessMultiplier)
+	self.fatnessMultiplier = fatnessMultiplier
+end
+
+function Arc.new(source, drain, color, topColor, numArcs, fatnessMultiplier, enabled)
     if source ~= nil and typeof(source) ~= "Vector3" then
         error(ERROR_TYPE_FORMAT:format(1, "new", "Vector3", typeof(source)), 2)
     elseif drain ~= nil and typeof(drain) ~= "Vector3" then
@@ -91,7 +99,11 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
     elseif numArcs ~= nil and type(numArcs) ~= "number" then
         error(ERROR_TYPE_FORMAT:format(5, "new", "number", typeof(numArcs)), 2)
     elseif numArcs ~= nil and numArcs < 1 then
-        error(ERROR_BAD_ARGUMENT:format(5, "new", "the number of arcs should be >= 1"), 2)
+		error(ERROR_BAD_ARGUMENT:format(5, "new", "number of arcs should be >= 1"), 2)
+	elseif fatnessMultiplier ~= nil and type(fatnessMultiplier) ~= "number" then
+        error(ERROR_TYPE_FORMAT:format(6, "new", "number", typeof(fatnessMultiplier)), 2)
+    elseif fatnessMultiplier ~= nil and fatnessMultiplier < 0 then
+        error(ERROR_BAD_ARGUMENT:format(6, "new", "multiplier should be >= 0"), 2)
 	elseif enabled ~= nil and type(enabled) ~= "boolean" then
         error(ERROR_TYPE_FORMAT:format(6, "new", "boolean", typeof(enabled)), 2)
 	end
@@ -101,6 +113,7 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
 	color = color or Constants.DEFAULT_COLOR
 	topColor = topColor or Constants.DEFAULT_TOP_COLOR
 	numArcs = numArcs or Constants.DEFAULT_NUM_ARCS
+	fatnessMultiplier = fatnessMultiplier or 1
 
     local self = setmetatable({}, Arc)
 
@@ -114,7 +127,8 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
     self.topColor = topColor -- Brightest color that will appear
     self.arc = 1 -- Which arc is being animated (loops)
     self.numArcs = numArcs -- Number of arcs at any time inside the effect
-    self.arcRenderAmount = 0 -- Number of arcs left to render in next heartbeat (can be a real value)
+	self.arcRenderAmount = 0 -- Number of arcs left to render in next heartbeat (can be a real value)
+	self.fatnessMultiplier = fatnessMultiplier -- multiply the computed fatnesses by this number for this arc
     self.visible = true -- Whether effect is on-screen
 
 	-- Part that all effects are attached to, with a light in it
@@ -186,7 +200,7 @@ function Arc.new(source, drain, color, topColor, numArcs, enabled)
     return self
 end
 
-function Arc.link(source, drain, color, topColor, numArcs, enabled)
+function Arc.link(source, drain, color, topColor, numArcs, fatnessMultiplier, enabled)
 	if typeof(source) ~= "Instance" or not source:IsA("Attachment") then
         error(ERROR_TYPE_FORMAT:format(1, "attach", "Attachment", typeof(source)), 2)
     elseif typeof(drain) ~= "Instance" or not drain:IsA("Attachment") then
@@ -203,7 +217,15 @@ function Arc.link(source, drain, color, topColor, numArcs, enabled)
         error(ERROR_TYPE_FORMAT:format(6, "attach", "boolean", typeof(enabled)), 2)
 	end
 
-	local self = Arc.new(source.WorldPosition, drain.WorldPosition, color, topColor, numArcs, false)
+	local self = Arc.new(
+		source.WorldPosition,
+		drain.WorldPosition,
+		color,
+		topColor,
+		numArcs,
+		fatnessMultiplier,
+		false
+	)
 	self.dynamic = true
 	self.source = source
 	self.drain = drain

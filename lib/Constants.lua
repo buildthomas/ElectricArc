@@ -12,9 +12,13 @@ return {
 	DEFAULT_ENABLED = true;                         -- Whether enabled at creation
 
 	USE_POINTLIGHT = true;                          -- Whether the arc will have a PointLight in it that flickers
+	                                                -- (turning off might improve performance since less lighting updates)
 
 	ARC_TEXTURE = "rbxassetid://750609714";         -- White texture of an arc segment (glowing line)
 	ARC_FATNESS_SIZE_MODIFIER = 0.035;              -- Determines fatness based on arc length
+	ARC_FATNESS_OVERLAP_RATIO = 0.0625;             -- If segments need to overlap slightly, and how much compared to width
+	ARC_STRONG_BRIGHTNESS_THRESHOLD = 0.98;         -- Above which value should brightness be for it to be a strong arc
+	ARC_FATNESS_STRONG_MULTIPLIER = 2;              -- How much fatter are strong arcs compared to weak ones
 	ARC_MIN_FATNESS = 0.4;
 	ARC_MAX_FATNESS = 5;
 
