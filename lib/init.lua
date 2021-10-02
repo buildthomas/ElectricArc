@@ -154,7 +154,7 @@ function Arc.new(source, drain, color, topColor, numArcs, fatnessMultiplier, ena
 	emitterLight.Name = "PointLight"
 	emitterLight.Brightness = 5
 	emitterLight.Color = Color3.new(0, 0, 0):lerp(color, Constants.LIGHT_COLOR_MODIFIER)
-	emitterLight.Range = 0
+	emitterLight.Range = axis.magnitude	//Setting this ahead of time to make sure non-Dynamic arcs get a light!
 	emitterLight.Shadows = true
 	emitterLight.Enabled = Constants.USE_POINTLIGHT
 	emitterLight.Parent = emitter
