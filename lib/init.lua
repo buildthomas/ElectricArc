@@ -154,7 +154,8 @@ function Arc.new(source, drain, color, topColor, numArcs, fatnessMultiplier, ena
 	emitterLight.Name = "PointLight"
 	emitterLight.Brightness = 5
 	emitterLight.Color = Color3.new(0, 0, 0):lerp(color, Constants.LIGHT_COLOR_MODIFIER)
-	emitterLight.Range = 0
+	-- Set range ahead of time to ensure static arcs have a light
+	emitterLight.Range = axis.magnitude
 	emitterLight.Shadows = true
 	emitterLight.Enabled = Constants.USE_POINTLIGHT
 	emitterLight.Parent = emitter
